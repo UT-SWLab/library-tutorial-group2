@@ -4,6 +4,7 @@ import static org.mockito.Mockito.*;
 import org.junit.*;
 
 import investing.*;
+import jdk.jfr.Timestamp;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PortfolioTester {
@@ -77,7 +78,8 @@ public class PortfolioTester {
     }
 
     @Test
-    public void testGetBeta(){
+    public void testPortfolioBeta(){
+        setUp();
         portfolio.setStockService(stockService);
 
         double portfolioBeta = portfolio.getPortfolioBeta();
@@ -110,5 +112,39 @@ public class PortfolioTester {
     }
 
     @Test
+    public void testPortfolioDividend(){
+        setUp();
+        portfolio.setStockService(stockService);
+
+        double portfolioDividend = portfolio.getPortfolioDividendAmount();
+        double correctDividend = 5010;
+        Assert.assertEquals(correctDividend , portfolioDividend);
+    }
+
+    @Test
+    public void getDividend(){
+        portfolio.setStockService(stockService);
+
+        List<Stock> stocks = new ArrayList<Stock>();
+        Stock googleStock = new Stock("1","Google", 10);
+        Stock microsoftStock = new Stock("2","Microsoft",100);	
+ 
+        stocks.add(googleStock);
+        stocks.add(microsoftStock);
+
+        //add stocks to the portfolio
+        portfolio.setStocks(stocks);
+
+        when(stockService.getDividend(microsoftStock)).thenReturn(.02);
+        when(stockService.getDividend(googleStock)).thenReturn(.05);
+
+        double portfolioDividend = portfolio.getPortfolioDividendAmount();
+        double correctDividend = 5010;
+        Assert.assertEquals(correctDividend , portfolioDividend);
+
+        verify(stockService).getDividend(googleStock);
+        verify(stockService).getDividend(microsoftStock);
+        }
+    }
 
 }
